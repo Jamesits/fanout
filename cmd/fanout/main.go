@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/hashicorp/nomad/api"
-	"github.com/spf13/pflag"
 	"io"
 	"log"
 	"net"
@@ -11,6 +9,9 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/hashicorp/nomad/api"
+	"github.com/spf13/pflag"
 )
 
 var (
@@ -48,6 +49,8 @@ func updateServices(c *api.Client) error {
 		return err
 	}
 
+	// TODO: remove canary services by tag
+	// TODO: print service changes
 	mu.Lock()
 	defer mu.Unlock()
 	sg = services
