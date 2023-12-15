@@ -1,0 +1,72 @@
+# IDEA auto formatter is causing trouble
+# @formatter:off
+before:
+  hooks:
+    - "go mod verify"
+
+env:
+  - "GO111MODULE=on"
+  - "CGO_ENABLED=0"
+
+builds:
+  - id: "fanout"
+    main: "./cmd/fanout"
+    binary: "fanout"
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    goos:
+      - "linux"
+    goarch:
+      - "amd64"
+      - "arm"
+      - "arm64"
+    goarm:
+      - "6"
+      - "7"
+    flags:
+      - "-v"
+      - "-trimpath"
+      - "-buildvcs=true"
+    asmflags:
+      - "all=-trimpath={{ .Env.GOPATH }}"
+    gcflags:
+      - "all=-trimpath={{ .Env.GOPATH }}"
+    ldflags:
+      - "-s"
+      - "-w"
+    hooks:
+      post:
+        - "upx \"{{ .Path }}\""
+        - "sudo setcap 'cap_net_bind_service=+ep' \"{{ .Path }}\""
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+archives:
+  - id: "release"
+    format: "tar.xz"
+    wrap_in_directory: true
+    rlcp: true
+    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+
+dockers:
+  - dockerfile: "Dockerfile.goreleaser"
+    image_templates:
+    - jamesits/fanout:latest
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: "sha256"
+
+changelog:
+  sort: "asc"
+  filters:
+    exclude:
+      - "^doc:"
+      - "^docs:"
+      - "^test:"
+      - "^cleanup:"
+      - "^ci:"
+      - "typo"
+      - "readme"
+      - "README"
+      - "comment"

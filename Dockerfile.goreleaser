@@ -1,0 +1,3 @@
+FROM scratch
+COPY fanout /
+ENTRYPOINT ["/fanout"]
