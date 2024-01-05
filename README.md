@@ -56,12 +56,12 @@ job "backend" {
         sidecar = true
       }
       identity { file = true }
-      driver = "docker"
+      driver       = "docker"
       config {
         image      = "jamesits/fanout:latest"
         args       = ["--service", "redis", "--listen-address", "127.0.0.1:6379"]
       }
-      kill_signal = "SIGQUIT"
+      kill_signal  = "SIGQUIT"
     }
     task "rails" {
       driver = "docker"
@@ -90,6 +90,6 @@ apt install containernetworking-plugins
 Then config the Nomad clients to discover the plugins:
 ```hcl2
 client {
-  cni_path          = "/usr/lib/cni"
+  cni_path = "/usr/lib/cni"
 }
 ```
