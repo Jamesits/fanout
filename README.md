@@ -15,7 +15,7 @@ For example, we have a group of Redis server as our service being discovered:
 ```hcl2
 job "redis" {
   group "redis" {
-    count = 3 // high-available setup is left out
+    count = 3 // actual HA setup is left out
     network {
       port "redis" { to = 6379 }
     }
