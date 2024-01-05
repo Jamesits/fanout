@@ -5,7 +5,9 @@ import (
 	"github.com/spf13/pflag"
 	"net"
 	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 )
 
 var (
@@ -13,8 +15,10 @@ var (
 	listenAddress string
 	allowStale    bool
 
-	mu sync.RWMutex
-	sg []*api.ServiceRegistration
+	mu        sync.RWMutex
+	sg        []*api.ServiceRegistration
+	closeOnce sync.Once
+	connWG    sync.WaitGroup
 )
 
 func init() {
@@ -47,7 +51,36 @@ func main() {
 	}
 
 	// TCP connection handling
+	go handleTCPConn(listener)
+
+	// wait for exit
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
 	for {
-		_ = handleTCPConn(listener)
+		s := <-c
+
+		// https://eli.thegreenplace.net/2020/graceful-shutdown-of-a-tcp-server-in-go/
+		closeOnce.Do(func() {
+			errorLogger.Info("stopping the listener")
+			err = listener.Close()
+			if err != nil {
+				errorLogger.Error("unable to stop the listener", "error", err)
+			}
+		})
+
+		switch s {
+		case syscall.SIGTERM:
+			errorLogger.Warn("force exiting")
+			os.Exit(0)
+		case syscall.SIGQUIT, syscall.SIGINT:
+			errorLogger.Info("graceful exit triggered, waiting for current connections to finish")
+			go func() {
+				connWG.Wait()
+				os.Exit(0)
+			}()
+		default:
+			errorLogger.Error("caught unknown signal, exiting", "signal", s)
+			os.Exit(255)
+		}
 	}
 }
