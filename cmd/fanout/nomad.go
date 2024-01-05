@@ -4,6 +4,7 @@ import (
 	"github.com/hashicorp/nomad/api"
 	"os"
 	"path/filepath"
+	"slices"
 	"sync/atomic"
 	"time"
 )
@@ -70,10 +71,17 @@ func updateServices() {
 			AuthToken:  *token,
 		})
 		if err == nil {
-			// TODO: remove canary services by tag
+			var newSg []*api.ServiceRegistration
+			for _, s := range services {
+				if slices.Contains(s.Tags, "fanout.canary=1") {
+					continue
+				}
+
+				newSg = append(newSg, s)
+			}
 			// TODO: print service changes
 			mu.Lock()
-			sg = services
+			sg = newSg
 			mu.Unlock()
 		} else {
 			errorLogger.Error("unable to load service endpoints from Nomad", "error", err)
