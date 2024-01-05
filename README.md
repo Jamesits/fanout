@@ -9,6 +9,7 @@ Fanout exists as a sidecar task, listens on a local port, and proxies incoming c
 Supported features:
 - Protocol: TCP
 - Upstream selection algorithm: round-robin
+- Affinity: same region + same namespace (hardcoded for now)
 
 ## Usage
 
