@@ -8,6 +8,7 @@ Fanout exists as a sidecar task, listens on a local port, and proxies incoming c
 
 Supported features:
 - Protocol: TCP
+- Upstream selection algorithm: round-robin
 
 ## Usage
 
@@ -20,9 +21,9 @@ job "redis" {
       port "redis" { to = 6379 }
     }
     service {
-      provider = "nomad"
-      name     = "redis"
-      port     = "redis"
+      provider    = "nomad"
+      name        = "redis"
+      port        = "redis"
       canary_tags = ["fanout.canary=1"]
     }
     task "redis" {
