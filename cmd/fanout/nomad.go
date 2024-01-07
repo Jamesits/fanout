@@ -66,6 +66,11 @@ func updateServices() {
 
 	for {
 		token := nomadToken.Load()
+        if token == nil { // wait for workload identity to be read; TODO: refactor this with a proper sync primitive
+            errorLogger.Debug("waiting for token retrieval")
+            time.Sleep(10 * time.Millisecond)
+            continue
+        }
 		services, _, err := c.Services().Get(service, &api.QueryOptions{
 			AllowStale: allowStale,
 			AuthToken:  *token,

@@ -52,6 +52,7 @@ func main() {
 
 	// TCP connection handling
 	go handleTCPConn(listener)
+    errorLogger.Info("Fanout started", "service", service, "listen_address", listenAddress)
 
 	// wait for exit
 	c := make(chan os.Signal, 1)
