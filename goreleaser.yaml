@@ -13,15 +13,10 @@ builds:
     main: "./cmd/fanout"
     binary: "fanout"
     mod_timestamp: "{{ .CommitTimestamp }}"
-    goos:
-      - "linux"
-    goarch:
-      - "amd64"
-      - "arm"
-      - "arm64"
-    goarm:
-      - "6"
-      - "7"
+    goos: ["linux", "darwin", "windows", "freebsd"]
+    goarch: ["amd64", "arm", "arm64"]
+    goarm: ["6", "7"]
+    goamd64: ["v1", "v2", "v3", "v4"]
     flags:
       - "-v"
       - "-trimpath"
@@ -35,7 +30,7 @@ builds:
       - "-w"
     hooks:
       post:
-        - "upx \"{{ .Path }}\""
+        - "sh -c 'upx \"{{ .Path }}\" || true'"
         - "sudo setcap 'cap_net_bind_service=+ep' \"{{ .Path }}\""
 
 snapshot:
@@ -46,7 +41,6 @@ archives:
     format: "tar.xz"
     wrap_in_directory: true
     rlcp: true
-    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
 
 dockers:
   - dockerfile: "Dockerfile.goreleaser"
