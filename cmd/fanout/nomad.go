@@ -42,7 +42,7 @@ func updateWorkloadIdentity() {
 	// refresh
 	for {
 		t, err := os.ReadFile(p)
-		if err != nil {
+		if err != nil || len(t) == 0 {
 			errorLogger.Warn("failed refreshing workload identity from file", "error", err)
 		} else {
 			token = string(t)

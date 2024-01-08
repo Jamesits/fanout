@@ -28,12 +28,14 @@ func handleTCPConn(listener *net.TCPListener) {
 			errorLogger.Error("accept connection failed", "local_address", conn.LocalAddr(), "remote_address", conn.RemoteAddr(), "error", err)
 			continue
 		}
+        // errorLogger.Debug("new connection", "incoming_remote_address", conn.RemoteAddr(), "incoming_local_address", conn.LocalAddr())
 
 		// get a possible endpoint
 		mu.RLock()
 		if len(sg) == 0 {
 			errorLogger.Warn("no upstream found")
 			_ = conn.Close()
+            mu.RUnlock()
 			continue
 		}
 		cnt = (cnt + 1) % len(sg) // round-robin
