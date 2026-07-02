@@ -1,6 +1,6 @@
 module github.com/jamesits/fanout
 
-go 1.21.5
+go 1.25.0
 
 require (
 	github.com/hashicorp/nomad/api v0.0.0-20231214201455-a8d14475507c
@@ -21,5 +21,5 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	golang.org/x/exp v0.0.0-20231214170342-aacd6d4b4611 // indirect
-	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
 )
